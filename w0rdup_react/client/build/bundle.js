@@ -19756,6 +19756,8 @@
 	'use strict';
 	
 	var React = __webpack_require__(1);
+	var EntityText = __webpack_require__(160);
+	
 	var Display = React.createClass({
 	  displayName: 'Display',
 	
@@ -19794,7 +19796,8 @@
 	          { onSubmit: this.submitForm },
 	          React.createElement('textarea', { value: this.state.userText, onChange: this.takeUserText }),
 	          React.createElement('input', { type: 'submit' })
-	        )
+	        ),
+	        React.createElement(EntityText, null)
 	      );
 	    } else {
 	      return React.createElement(
@@ -19826,7 +19829,8 @@
 	      magnitude: 0,
 	      polarity: 0,
 	      userText: "",
-	      data: ""
+	      data: "",
+	      spans: ''
 	    };
 	  },
 	
@@ -19862,24 +19866,195 @@
 	    request.open('POST', url, true);
 	    request.setRequestHeader('Content-Type', 'application/json');
 	    request.send(JSON.stringify(params));
-	
 	    request.onreadystatechange = function () {
 	      if (request.readyState == XMLHttpRequest.DONE) {
-	        console.log(request.responseText);
 	        var response = JSON.parse(request.responseText);
+	        var entSpans = this.getSpanIndices(response);
 	        this.setState({
 	          magnitude: response.sentiment.magnitude,
 	          polarity: response.sentiment.polarity,
 	          data: response,
-	          text: response.submittedText
+	          text: response.submittedText,
+	          spans: entSpans
 	        });
 	      }
 	    }.bind(this);
+	  },
+	
+	  getSpanIndices: function getSpanIndices(data) {
+	    var spans = [];
+	    var _iteratorNormalCompletion = true;
+	    var _didIteratorError = false;
+	    var _iteratorError = undefined;
+	
+	    try {
+	      for (var _iterator = Object.keys(data.entities)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	        var key = _step.value;
+	        var _iteratorNormalCompletion3 = true;
+	        var _didIteratorError3 = false;
+	        var _iteratorError3 = undefined;
+	
+	        try {
+	          for (var _iterator3 = data.entities[key][Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+	            var entity = _step3.value;
+	            var _iteratorNormalCompletion4 = true;
+	            var _didIteratorError4 = false;
+	            var _iteratorError4 = undefined;
+	
+	            try {
+	              for (var _iterator4 = entity.mentions[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+	                var mention = _step4.value;
+	
+	                var content = mention.text.content;
+	                var beginOffset = mention.text.beginOffset;
+	                var contentLength = content.length;
+	                var endOffset = beginOffset + contentLength - 1;
+	                var mentionSpan = {
+	                  "type": key,
+	                  "content": content,
+	                  "beginOffset": beginOffset,
+	                  "endOffset": endOffset
+	                };
+	                spans.push(mentionSpan);
+	              }
+	            } catch (err) {
+	              _didIteratorError4 = true;
+	              _iteratorError4 = err;
+	            } finally {
+	              try {
+	                if (!_iteratorNormalCompletion4 && _iterator4.return) {
+	                  _iterator4.return();
+	                }
+	              } finally {
+	                if (_didIteratorError4) {
+	                  throw _iteratorError4;
+	                }
+	              }
+	            }
+	          }
+	        } catch (err) {
+	          _didIteratorError3 = true;
+	          _iteratorError3 = err;
+	        } finally {
+	          try {
+	            if (!_iteratorNormalCompletion3 && _iterator3.return) {
+	              _iterator3.return();
+	            }
+	          } finally {
+	            if (_didIteratorError3) {
+	              throw _iteratorError3;
+	            }
+	          }
+	        }
+	      }
+	    } catch (err) {
+	      _didIteratorError = true;
+	      _iteratorError = err;
+	    } finally {
+	      try {
+	        if (!_iteratorNormalCompletion && _iterator.return) {
+	          _iterator.return();
+	        }
+	      } finally {
+	        if (_didIteratorError) {
+	          throw _iteratorError;
+	        }
+	      }
+	    }
+	
+	    var remainingSpans = this.unTypedSpans(data, spans);
+	    var _iteratorNormalCompletion2 = true;
+	    var _didIteratorError2 = false;
+	    var _iteratorError2 = undefined;
+	
+	    try {
+	      for (var _iterator2 = remainingSpans[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+	        var span = _step2.value;
+	
+	        spans.push(span);
+	      }
+	    } catch (err) {
+	      _didIteratorError2 = true;
+	      _iteratorError2 = err;
+	    } finally {
+	      try {
+	        if (!_iteratorNormalCompletion2 && _iterator2.return) {
+	          _iterator2.return();
+	        }
+	      } finally {
+	        if (_didIteratorError2) {
+	          throw _iteratorError2;
+	        }
+	      }
+	    }
+	
+	    spans = this.sortSpans(spans);
+	    spans = spans.map(function (span) {
+	      return { "type": span.type, "content": span.content };
+	    });
+	    return spans;
+	  },
+	
+	  unTypedSpans: function unTypedSpans(data, spans) {
+	    var text = data.submittedText;
+	    var sorted = this.sortSpans(spans);
+	    var unTypedArray = [];
+	    var start = 0;
+	    for (var i = 0; i < sorted.length; i++) {
+	      var unTypedString = text.slice(start, sorted[i].beginOffset);
+	      var span = {
+	        "content": unTypedString,
+	        "beginOffset": start,
+	        "endOffset": sorted[i].beginOffset
+	      };
+	      unTypedArray.push(span);
+	      start = sorted[i].endOffset + 1;
+	    }
+	    var lastString = text.slice(start, text.length);
+	    var lastSpan = {
+	      "content": lastString,
+	      "beginOffset": sorted[sorted.length - 1].endOffset + 1,
+	      "endOffset": text.length
+	    };
+	    unTypedArray.push(lastSpan);
+	    return unTypedArray;
+	  },
+	
+	  sortSpans: function sortSpans(spansArray) {
+	    var sorted = spansArray.sort(function (a, b) {
+	      return a.beginOffset - b.beginOffset;
+	    });
+	    return sorted;
 	  }
 	
 	});
 	
 	module.exports = Display;
+
+/***/ },
+/* 160 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var React = __webpack_require__(1);
+	
+	var EntityText = React.createClass({
+	  displayName: 'EntityText',
+	
+	
+	  render: function render() {
+	
+	    return React.createElement(
+	      'p',
+	      null,
+	      'This is the entity text display'
+	    );
+	  }
+	
+	});
+	
+	module.exports = EntityText;
 
 /***/ }
 /******/ ]);

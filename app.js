@@ -35,7 +35,6 @@ app.post('/', function(req, res) {
       console.error(err);
       return;
     }
-    // console.log(annotations.entities.people[0]);
     annotations.submittedText = req.body.userText;
     res.send(annotations);
   });
