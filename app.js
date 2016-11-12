@@ -18,12 +18,13 @@ app.use(function(req, res, next) {
 });
 
 app.get('/', function(req, res) {
-  let analysis = languageClient.detectSentiment('Please enter text for analysis. Thanks!', { verbose: true }, (err, sentiment) => {
+  let holderText = 'Contact established with Google Cloud Platform Natural Language API; please enter text for analysis in the form above.';
+  let analysis = languageClient.detectSentiment(holderText, { verbose: true }, (err, sentiment) => {
     if (err) {
       console.error(err);
       return;
     }
-    res.json({"text": 'Please enter text for analysis. Thanks!', "polarity": sentiment.polarity, "magnitude": sentiment.magnitude});
+    res.json({"text": holderText, "polarity": sentiment.polarity, "magnitude": sentiment.magnitude});
   });
 });
 

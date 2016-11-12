@@ -19764,40 +19764,114 @@
 	
 	  render: function render() {
 	
+	    var key = React.createElement(
+	      'div',
+	      { style: { color: 'white', marginTop: '10px' } },
+	      React.createElement(
+	        'p',
+	        { style: { margin: '0', backgroundColor: 'red', width: '23%', display: 'inline-block' } },
+	        'People'
+	      ),
+	      React.createElement(
+	        'p',
+	        { style: { margin: '0', backgroundColor: 'blue', width: '23%', display: 'inline-block' } },
+	        'Places'
+	      ),
+	      React.createElement(
+	        'p',
+	        { style: { margin: '0', backgroundColor: 'orange', width: '23%', display: 'inline-block' } },
+	        'Art'
+	      ),
+	      React.createElement(
+	        'p',
+	        { style: { margin: '0', backgroundColor: 'BlueViolet', width: '23%', display: 'inline-block' } },
+	        'Events'
+	      ),
+	      React.createElement(
+	        'p',
+	        { style: { margin: '0', backgroundColor: 'Chartreuse', width: '23%', display: 'inline-block' } },
+	        'Goods'
+	      ),
+	      React.createElement(
+	        'p',
+	        { style: { margin: '0', backgroundColor: 'DarkGreen', width: '23%', display: 'inline-block' } },
+	        'Organizations'
+	      ),
+	      React.createElement(
+	        'p',
+	        { style: { margin: '0', backgroundColor: 'HotPink', width: '23%', display: 'inline-block' } },
+	        'Other'
+	      ),
+	      React.createElement(
+	        'p',
+	        { style: { margin: '0', backgroundColor: 'LightSkyBlue', width: '23%', display: 'inline-block' } },
+	        'Unknown'
+	      )
+	    );
+	
 	    if (this.state.text != "") {
 	      return React.createElement(
 	        'div',
-	        null,
+	        { style: { textAlign: 'center' } },
 	        React.createElement(
-	          'p',
+	          'h3',
 	          null,
-	          '\'Lawrence of Arabia\' is a highly rated film biography about British Lieutenant T. E. Lawrence. Peter O\'Toole plays Lawrence in the film.'
+	          'Basic text analysis using Google Cloud Platform\'s Natural Language ',
+	          React.createElement(
+	            'a',
+	            { href: 'https://cloud.google.com/natural-language', target: '_blank' },
+	            'API'
+	          )
 	        ),
 	        React.createElement(
-	          'p',
-	          null,
-	          'Text: ',
-	          this.state.text
+	          'form',
+	          { onSubmit: this.submitForm },
+	          React.createElement('textarea', { style: { width: '100%', height: '12em' }, value: this.state.userText, onChange: this.takeUserText }),
+	          React.createElement('input', { style: { width: '50%', margin: '10px', marginBottom: '30px', backgroundColor: 'LemonChiffon', fontSize: '18px' }, type: 'submit' })
 	        ),
+	        React.createElement(EntityText, { spans: this.state.spans }),
+	        key,
 	        React.createElement(
 	          'p',
 	          null,
-	          'Magnitude: ',
+	          React.createElement(
+	            'a',
+	            { href: 'https://cloud.google.com/natural-language/docs/basics#sentiment_analysis', target: '_blank' },
+	            'Magnitude'
+	          ),
+	          ': ',
 	          this.state.magnitude
 	        ),
 	        React.createElement(
 	          'p',
 	          null,
-	          'Polarity: ',
+	          React.createElement(
+	            'a',
+	            { href: 'https://cloud.google.com/natural-language/docs/basics#sentiment_analysis', target: '_blank' },
+	            'Polarity'
+	          ),
+	          ': ',
 	          this.state.polarity
 	        ),
 	        React.createElement(
-	          'form',
-	          { onSubmit: this.submitForm },
-	          React.createElement('textarea', { value: this.state.userText, onChange: this.takeUserText }),
-	          React.createElement('input', { type: 'submit' })
+	          'h4',
+	          null,
+	          'Last text analysed:'
 	        ),
-	        React.createElement(EntityText, null)
+	        React.createElement(
+	          'p',
+	          { style: { textAlign: 'justify', width: 'calc(100% - 60px)', padding: '30px' } },
+	          this.state.text
+	        ),
+	        React.createElement(
+	          'footer',
+	          null,
+	          React.createElement(
+	            'p',
+	            null,
+	            '\xA9 Donald Lessells 2016'
+	          )
+	        )
 	      );
 	    } else {
 	      return React.createElement(
@@ -19806,18 +19880,16 @@
 	        React.createElement(
 	          'p',
 	          null,
-	          '\'Lawrence of Arabia\' is a highly rated film biography about British Lieutenant T. E. Lawrence. Peter O\'Toole plays Lawrence in the film.'
+	          'No data received from API - please refresh page if app doesn\'t appear.'
 	        ),
 	        React.createElement(
-	          'p',
+	          'footer',
 	          null,
-	          'Nothing to display :('
-	        ),
-	        React.createElement(
-	          'form',
-	          null,
-	          React.createElement('textarea', { value: this.state.userText, onChange: this.takeUserText }),
-	          React.createElement('input', { type: 'submit' })
+	          React.createElement(
+	            'p',
+	            null,
+	            '\xA9 Donald Lessells 2016'
+	          )
 	        )
 	      );
 	    }
@@ -20038,6 +20110,8 @@
 	'use strict';
 	
 	var React = __webpack_require__(1);
+	var EntitySpan = __webpack_require__(161);
+	var NonEntitySpan = __webpack_require__(162);
 	
 	var EntityText = React.createClass({
 	  displayName: 'EntityText',
@@ -20045,16 +20119,139 @@
 	
 	  render: function render() {
 	
+	    var nodes = [];
+	    for (var n = 0; n < this.props.spans.length; n++) {
+	      if (this.props.spans[n].type) {
+	        nodes.push(React.createElement(EntitySpan, { key: n.toString() + this.props.spans[n].content, data: { "type": this.props.spans[n].type, "content": this.props.spans[n].content } }));
+	      } else {
+	        nodes.push(React.createElement(NonEntitySpan, { key: n.toString() + this.props.spans[n].content, data: { "content": this.props.spans[n].content } }));
+	      }
+	    };
+	
 	    return React.createElement(
-	      'p',
-	      null,
-	      'This is the entity text display'
+	      'div',
+	      { style: { textAlign: 'justify', width: 'calc(100% - 60px)', backgroundColor: 'LightSteelBlue ', padding: '30px' } },
+	      nodes
 	    );
 	  }
 	
 	});
 	
 	module.exports = EntityText;
+
+/***/ },
+/* 161 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var React = __webpack_require__(1);
+	
+	var EntitySpan = React.createClass({
+	  displayName: 'EntitySpan',
+	
+	
+	  render: function render() {
+	
+	    var styles = {
+	      people: {
+	        backgroundColor: 'red',
+	        color: 'white'
+	      },
+	      places: {
+	        backgroundColor: 'blue',
+	        color: 'white'
+	      },
+	      art: {
+	        backgroundColor: 'orange',
+	        color: 'white'
+	      },
+	      events: {
+	        backgroundColor: 'BlueViolet',
+	        color: 'white'
+	      },
+	      goods: {
+	        backgroundColor: 'Chartreuse',
+	        color: 'white'
+	      },
+	      organizations: {
+	        backgroundColor: 'DarkGreen',
+	        color: 'white'
+	      },
+	      other: {
+	        backgroundColor: 'HotPink',
+	        color: 'white'
+	      },
+	      unknown: {
+	        backgroundColor: 'LightSkyBlue',
+	        color: 'white'
+	      }
+	    };
+	
+	    var spanStyle = null;
+	
+	    switch (this.props.data.type) {
+	      case 'people':
+	        spanStyle = styles.people;
+	        break;
+	      case 'places':
+	        spanStyle = styles.places;
+	        break;
+	      case 'art':
+	        spanStyle = styles.art;
+	        break;
+	      case 'events':
+	        spanStyle = styles.events;
+	        break;
+	      case 'goods':
+	        spanStyle = styles.goods;
+	        break;
+	      case 'organizations':
+	        spanStyle = styles.organizations;
+	        break;
+	      case 'other':
+	        spanStyle = styles.other;
+	        break;
+	      case 'unknown':
+	        spanStyle = styles.unknown;
+	        break;
+	    }
+	
+	    return React.createElement(
+	      'span',
+	      { style: spanStyle },
+	      this.props.data.content
+	    );
+	  }
+	
+	});
+	
+	module.exports = EntitySpan;
+
+/***/ },
+/* 162 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var React = __webpack_require__(1);
+	
+	var NonEntitySpan = React.createClass({
+	  displayName: 'NonEntitySpan',
+	
+	
+	  render: function render() {
+	
+	    return React.createElement(
+	      'span',
+	      null,
+	      this.props.data.content
+	    );
+	  }
+	
+	});
+	
+	module.exports = NonEntitySpan;
 
 /***/ }
 /******/ ]);

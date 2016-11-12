@@ -6,29 +6,39 @@ const Display = React.createClass({
 
   render: function(){
 
+    let key = (<div style={{color: 'white', marginTop: '10px'}}>
+                <p style={{margin: '0', backgroundColor: 'red', width: '23%', display: 'inline-block'}}>People</p>
+                <p style={{margin: '0', backgroundColor: 'blue', width: '23%', display: 'inline-block'}}>Places</p>
+                <p style={{margin: '0', backgroundColor: 'orange', width: '23%', display: 'inline-block'}}>Art</p>
+                <p style={{margin: '0', backgroundColor: 'BlueViolet', width: '23%', display: 'inline-block'}}>Events</p>
+                <p style={{margin: '0', backgroundColor: 'Chartreuse', width: '23%', display: 'inline-block'}}>Goods</p>
+                <p style={{margin: '0', backgroundColor: 'DarkGreen', width: '23%', display: 'inline-block'}}>Organizations</p>
+                <p style={{margin: '0', backgroundColor: 'HotPink', width: '23%', display: 'inline-block'}}>Other</p>
+                <p style={{margin: '0', backgroundColor: 'LightSkyBlue', width: '23%', display: 'inline-block'}}>Unknown</p>
+              </div>);
+
     if (this.state.text != "") {
       return (
-        <div>
-          <p>'Lawrence of Arabia' is a highly rated film biography about British Lieutenant T. E. Lawrence. Peter O'Toole plays Lawrence in the film.</p>
-          <p>Text: {this.state.text}</p>
-          <p>Magnitude: {this.state.magnitude}</p>
-          <p>Polarity: {this.state.polarity}</p>
+        <div style={{textAlign: 'center'}}>
+          <h3>Basic text analysis using Google Cloud Platform's Natural Language <a href="https://cloud.google.com/natural-language" target="_blank">API</a></h3>
           <form onSubmit={this.submitForm}>
-            <textarea value={this.state.userText} onChange={this.takeUserText}></textarea>
-            <input type='submit'></input>
+            <textarea style={{width: '100%', height: '12em'}} value={this.state.userText} onChange={this.takeUserText}></textarea>
+            <input style={{width: '50%', margin: '10px', marginBottom: '30px', backgroundColor: 'LemonChiffon', fontSize: '18px'}}type='submit'></input>
           </form>
-          <EntityText />
+          <EntityText spans={this.state.spans}/>
+          {key}
+          <p><a href="https://cloud.google.com/natural-language/docs/basics#sentiment_analysis" target="_blank">Magnitude</a>: {this.state.magnitude}</p>
+          <p><a href="https://cloud.google.com/natural-language/docs/basics#sentiment_analysis" target="_blank">Polarity</a>: {this.state.polarity}</p>
+          <h4>Last text analysed:</h4>
+          <p style={{textAlign: 'justify', width: 'calc(100% - 60px)', padding: '30px'}}>{this.state.text}</p>
+          <footer><p>&copy; Donald Lessells 2016</p></footer>
         </div>
       );
     } else {
       return (
         <div>
-          <p>'Lawrence of Arabia' is a highly rated film biography about British Lieutenant T. E. Lawrence. Peter O'Toole plays Lawrence in the film.</p>
-          <p>Nothing to display :(</p>
-            <form>
-              <textarea value={this.state.userText} onChange={this.takeUserText}></textarea>
-              <input type='submit'></input>
-            </form>
+          <p>No data received from API - please refresh page if app doesn't appear.</p>
+          <footer><p>&copy; Donald Lessells 2016</p></footer>
         </div>
       );
     }
